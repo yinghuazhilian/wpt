@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+  <title>Images load immediately when lazyload attribute is changed to "off"</title>
+  <link rel="author" title="Scott Little" href="mailto:sclittle@chromium.org">
+  <link rel="help" href="https://github.com/whatwg/html/pull/3752">
+  <script src="/resources/testharness.js"></script>
+  <script src="/resources/testharnessreport.js"></script>
+</head>
+
+<!--
+Marked as tentative until https://github.com/whatwg/html/pull/3752 is landed.
+-->
+
+<body>
+  <div style="height:10000px;"></div>
+  <img id="attribute_unset" src="resources/image_1.png">
+  <img id="attribute_invalid" src="resources/image_2.png" lazyload="invalid_value">
+  <img id="attribute_auto" src="resources/image_3.png" lazyload="auto">
+  <img id="attribute_on" src="resources/image_4.png" lazyload="on">
+</body>
+
+<script>
+  var t = async_test("Test that a below viewport image that has its lazyload attribute changed to off is loaded.");
+
+  var has_attribute_unset_loaded = false;
+  var has_attribute_invalid_loaded = false;
+  var has_attribute_auto_loaded = false;
+  var has_attribute_on_loaded = false;
+
+  function checkIfDone() {
+    if (has_attribute_unset_loaded &&
+        has_attribute_invalid_loaded &&
+        has_attribute_auto_loaded &&
+        has_attribute_on_loaded) {
+      t.done();
+    }
+  }
+
+  document.getElementById("attribute_unset").addEventListener("load", t.step_func(function() {
+    assert_false(has_attribute_unset_loaded);
+    has_attribute_unset_loaded = true;
+    checkIfDone();
+  }));
+  document.getElementById("attribute_invalid").addEventListener("load", t.step_func(function() {
+    assert_false(has_attribute_invalid_loaded);
+    has_attribute_invalid_loaded = true;
+    checkIfDone();
+  }));
+  document.getElementById("attribute_auto").addEventListener("load", t.step_func(function() {
+    assert_false(has_attribute_auto_loaded);
+    has_attribute_auto_loaded = true;
+    checkIfDone();
+  }));
+  document.getElementById("attribute_on").addEventListener("load", t.step_func(function() {
+    assert_false(has_attribute_on_loaded);
+    has_attribute_on_loaded = true;
+    checkIfDone();
+  }));
+
+  window.addEventListener("load", t.step_func_done(function() {
+    document.getElementById("attribute_unset").setAttribute("lazyload", "off");
+    document.getElementById("attribute_invalid").setAttribute("lazyload", "off");
+    document.getElementById("attribute_auto").setAttribute("lazyload", "off");
+    document.getElementById("attribute_on").setAttribute("lazyload", "off");
+  }));
+</script>

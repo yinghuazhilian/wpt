@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<head>
+  <title>Below-viewport iframes don't endlessly delay the window load event.</title>
+  <link rel="author" title="Scott Little" href="mailto:sclittle@chromium.org">
+  <link rel="help" href="https://github.com/whatwg/html/pull/3752">
+  <script src="/resources/testharness.js"></script>
+  <script src="/resources/testharnessreport.js"></script>
+</head>
+
+<!--
+Marked as tentative until https://github.com/whatwg/html/pull/3752 is landed.
+-->
+
+<body>
+  <div style="height:10000px;"></div>
+  <iframe id="attribute_unset" src="https://{{hosts[][www]}}:{{ports[https][0]}}/loading/lazyload/resources/subframe_1.html" width="200px" height="100px"></iframe>
+  <iframe id="attribute_invalid" src="https://{{hosts[][www]}}:{{ports[https][0]}}/loading/lazyload/resources/subframe_2.html" width="200px" height="100px" lazyload="invalid_value"></iframe>
+  <iframe id="attribute_auto" src="https://{{hosts[][www]}}:{{ports[https][0]}}/loading/lazyload/resources/subframe_3.html" width="200px" height="100px" lazyload="auto"></iframe>
+  <iframe id="attribute_on" src="https://{{hosts[][www]}}:{{ports[https][0]}}/loading/lazyload/resources/subframe_4.html" width="200px" height="100px" lazyload="on"></iframe>
+</body>
+
+<script>
+  var t = async_test("Test that below-viewport iframes don't endlessly delay the window load event.");
+
+  // Note that the below-viewport elements' load events could happen before the
+  // window.load event occurs, if the browser decides to load immediately
+  // instead of lazily loading. This is valid behavior, since lazyload="on" is
+  // only a strong hint to the browser that the element is well suited to being
+  // lazily loaded, so the browser is not required to lazily load it. The unset,
+  // invalid, and "auto" attribute values similarly leave it up to the browser
+  // to decide whether or not to lazily load the element. As a result, the test
+  // passes once the below-viewport elements load.
+  window.addEventListener("load", t.step_func_done());
+</script>

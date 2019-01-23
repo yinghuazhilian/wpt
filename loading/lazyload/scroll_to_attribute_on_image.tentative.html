@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+  <title>Images with lazyload="on" load when in the viewport</title>
+  <link rel="author" title="Scott Little" href="mailto:sclittle@chromium.org">
+  <link rel="help" href="https://github.com/whatwg/html/pull/3752">
+  <script src="/resources/testharness.js"></script>
+  <script src="/resources/testharnessreport.js"></script>
+</head>
+
+<!--
+Marked as tentative until https://github.com/whatwg/html/pull/3752 is landed.
+-->
+
+<body>
+  <img id="in_viewport" src="resources/image_1.png" lazyload="on">
+  <div style="height:10000px;"></div>
+  <img id="below_viewport" src="resources/image_2.png" lazyload="on">
+</body>
+
+<script>
+  var t = async_test("Test that images with lazyload='on' that enter the viewport get loaded.");
+
+  var has_in_viewport_loaded = false;
+  var has_below_viewport_loaded = false;
+
+  document.getElementById("in_viewport").addEventListener("load", t.step_func(function() {
+    assert_false(has_in_viewport_loaded);
+    has_in_viewport_loaded = true;
+    if (has_below_viewport_loaded) {
+      // Note that the below_viewport element's load event could happen before
+      // the window.load event occurs, if the browser decides to load it
+      // immediately instead of lazily loading. This is valid behavior, so the
+      // test has passed if the below_viewport element has loaded.
+      t.done();
+    } else {
+      document.getElementById("below_viewport").scrollIntoView();
+    }
+  }));
+
+  document.getElementById("below_viewport").addEventListener("load", t.step_func(function() {
+    assert_false(has_below_viewport_loaded);
+    has_below_viewport_loaded = true;
+    if (has_in_viewport_loaded) {
+      t.done();
+    }
+  }));
+</script>

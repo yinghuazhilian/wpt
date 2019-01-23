@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+  <title>Loading images with lazyload="off"</title>
+  <link rel="author" title="Scott Little" href="mailto:sclittle@chromium.org">
+  <link rel="help" href="https://github.com/whatwg/html/pull/3752">
+  <script src="/resources/testharness.js"></script>
+  <script src="/resources/testharnessreport.js"></script>
+</head>
+
+<!--
+Marked as tentative until https://github.com/whatwg/html/pull/3752 is landed.
+-->
+
+<body>
+  <img id="in_viewport" src="resources/image_1.png" lazyload="off">
+  <div style="height:10000px;"></div>
+  <img id="below_viewport" src="resources/image_2.png" lazyload="off">
+</body>
+
+<script>
+  var t = async_test("Test that both images load immediately and block the window's load event.");
+
+  var has_in_viewport_image_loaded = false;
+  document.getElementById("in_viewport").addEventListener("load",
+    t.step_func(function() {
+      assert_false(has_in_viewport_image_loaded);
+      has_in_viewport_image_loaded = true;
+    }));
+
+  var has_below_viewport_image_loaded = false;
+  document.getElementById("below_viewport").addEventListener("load",
+    t.step_func(function() {
+      assert_false(has_below_viewport_image_loaded);
+      has_below_viewport_image_loaded = true;
+    }));
+
+  window.addEventListener("load", t.step_func_done(function() {
+    assert_true(has_in_viewport_image_loaded);
+    assert_true(has_below_viewport_image_loaded);
+  }));
+</script>

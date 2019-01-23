@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<head>
+  <title>Below-viewport images don't endlessly delay the window load event.</title>
+  <link rel="author" title="Scott Little" href="mailto:sclittle@chromium.org">
+  <link rel="help" href="https://github.com/whatwg/html/pull/3752">
+  <script src="/resources/testharness.js"></script>
+  <script src="/resources/testharnessreport.js"></script>
+</head>
+
+<!--
+Marked as tentative until https://github.com/whatwg/html/pull/3752 is landed.
+-->
+
+<body>
+  <div style="height:10000px;"></div>
+  <img id="attribute_unset" src="resources/image_1.png">
+  <img id="attribute_invalid" src="resources/image_2.png" lazyload="invalid_value">
+  <img id="attribute_auto" src="resources/image_3.png" lazyload="auto">
+  <img id="attribute_on" src="resources/image_4.png" lazyload="on">
+</body>
+
+<script>
+  var t = async_test("Test that below-viewport images don't endlessly delay the window load event.");
+
+  // Note that the below-viewport elements' load events could happen before the
+  // window.load event occurs, if the browser decides to load immediately
+  // instead of lazily loading. This is valid behavior, since lazyload="on" is
+  // only a strong hint to the browser that the element is well suited to being
+  // lazily loaded, so the browser is not required to lazily load it. The unset,
+  // invalid, and "auto" attribute values similarly leave it up to the browser
+  // to decide whether or not to lazily load the element. As a result, the test
+  // passes once the below-viewport elements load.
+  window.addEventListener("load", t.step_func_done());
+</script>
