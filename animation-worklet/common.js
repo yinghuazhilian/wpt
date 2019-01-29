@@ -3,7 +3,13 @@
 function registerPassthroughAnimator() {
   return runInAnimationWorklet(`
     registerAnimator('passthrough', class {
-      animate(currentTime, effect) { effect.localTime = currentTime; }
+      animate(currentTime, effect) {
+        // NaN is not a valid local time so we should handle it.
+        if (isNaN(currentTime))
+          return;
+
+        effect.localTime = currentTime;
+      }
     });
   `);
 }
