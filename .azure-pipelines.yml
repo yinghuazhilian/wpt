@@ -226,3 +226,11 @@ jobs:
     inputs:
       serviceConnection: staging.wpt.fyi
       urlSuffix: /api/checks/azure/$(Build.BuildId)
+
+- job: hack_publish_edge_webdriver
+  steps:
+  - template: tools/ci/azure/checkout.yml
+  - script: mv wpt_report_*.json $(Build.ArtifactStagingDirectory)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      artifactName: 'results'
