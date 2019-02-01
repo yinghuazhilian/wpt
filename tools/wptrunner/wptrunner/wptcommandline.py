@@ -197,6 +197,9 @@ scheme host and port.""")
                               help="Path to directory containing extra json files to add to run info")
     config_group.add_argument("--product", action="store", choices=product_choices,
                               default=None, help="Browser against which to run tests")
+    config_group.add_argument("--browser-name", action="store",
+                              default=None, help="Informative string detailing the browser "
+                              "name. This is included in the run_info data.")
     config_group.add_argument("--browser-version", action="store",
                               default=None, help="Informative string detailing the browser "
                               "release version. This is included in the run_info data.")

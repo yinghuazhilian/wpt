@@ -68,6 +68,7 @@ def get_run_info(metadata_root, product, **kwargs):
 
 class RunInfo(dict):
     def __init__(self, metadata_root, product, debug,
+                 browser_name=None,
                  browser_version=None,
                  browser_channel=None,
                  verify=None,
@@ -91,6 +92,8 @@ class RunInfo(dict):
         elif "debug" not in self:
             # Default to release
             self["debug"] = False
+        if browser_name:
+            self["browser_name"] = browser_name
         if browser_version:
             self["browser_version"] = browser_version
         if browser_channel:
