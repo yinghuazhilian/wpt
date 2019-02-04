@@ -162,8 +162,9 @@ jobs:
   # This job is only triggered manually until it has been shown to be robust.
   condition: and(eq(variables['Build.Reason'], 'Manual'), variables['run_all_edge'])
   # There are 5 agents in the pool, but use more jobs so that each takes <1h.
+  # 100 is to match https://github.com/web-platform-tests/results-collection/blob/5af91e8cc8026420f670025d3834c5182a5f98e3/src/master/master.cfg#L31
   strategy:
-    parallel: 20
+    parallel: 100
   timeoutInMinutes: 360
   pool:
     name: 'Hosted Windows Client'
@@ -177,7 +178,8 @@ jobs:
   - template: tools/ci/azure/install_certs.yml
   - template: tools/ci/azure/update_hosts.yml
   - template: tools/ci/azure/update_manifest.yml
-  - script: python ./wpt run --no-manifest-update --no-restart-on-unexpected --no-fail-on-unexpected --install-fonts --test-types reftest testharness --this-chunk $(System.JobPositionInPhase) --total-chunks $(System.TotalJobsInPhase) --chunk-type hash --log-tbpl - --log-tbpl-level info --log-wptreport $(Build.ArtifactStagingDirectory)/wpt_report_$(System.JobPositionInPhase).json edge_webdriver
+  # --run-by-dir 3 is to match https://github.com/web-platform-tests/results-collection/blob/43658ddac1124f3028a10cbf0d137d78cc16e16c/src/master/wpt_run_step.py#L80
+  - script: python ./wpt run --no-manifest-update --no-restart-on-unexpected --no-fail-on-unexpected --install-fonts --test-types reftest testharness --this-chunk $(System.JobPositionInPhase) --total-chunks $(System.TotalJobsInPhase) --run-by-dir 3 --log-tbpl - --log-tbpl-level info --log-wptreport $(Build.ArtifactStagingDirectory)/wpt_report_$(System.JobPositionInPhase).json edge_webdriver
     displayName: 'Run tests'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish results'
