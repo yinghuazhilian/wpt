@@ -1,4 +1,6 @@
 from __future__ import print_function
+import time
+import subprocess
 from .base import Browser, ExecutorBrowser, require_arg
 from ..webdriver_server import EdgeDriverServer
 from ..executors import executor_kwargs as base_executor_kwargs
