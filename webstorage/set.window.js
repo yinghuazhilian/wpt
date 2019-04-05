@@ -77,11 +77,10 @@
             storage.clear();
 
             var proto = "proto getter for " + this.name;
-            var calledSetter = [];
             Object.defineProperty(Storage.prototype, key, {
                 "get": function() { return proto; },
-                "set": function(v) { calledSetter.push(v); },
-                configurable: true,
+                "set": this.unreached_func("Should not call [[Set]] on prototype"),
+                "configurable": true,
             });
             this.add_cleanup(function() {
                 delete Storage.prototype[key];
