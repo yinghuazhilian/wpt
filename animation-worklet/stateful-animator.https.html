@@ -43,6 +43,18 @@
   });
 </script>
 
+<script id="stateless_animator_preserves_effect" type="text/worklet">
+  let time = 0;
+  registerAnimator("stateless_animator_preserves_effect", class {
+    animate(currentTime, effect) {
+      // The local time will be set to null if the effect cannot be preserved.
+      if (effect.localTime == null)
+        time = 0;
+      effect.localTime = time++;
+    }
+  });
+</script>
+
 <script id="state_function_returns_empty" type="text/worklet">
   registerAnimator("state_function_returns_empty", class {
     constructor(options, state = { test_local_time: 0 }) {
@@ -131,6 +143,21 @@
 
     animation.cancel();
   }, "Stateless animator gets reecreated with 'undefined' state.");
+
+  promise_test(async t => {
+    await runInAnimationWorklet(document.getElementById('stateless_animator_preserves_effect').textContent);
+    const target = document.getElementById('target');
+    const DURATION = 1000;
+    const effect = new KeyframeEffect(target, [{ opacity: 0 }], { duration: DURATION });
+    const animation = new WorkletAnimation('stateless_animator_preserves_effect', effect);
+    animation.play();
+
+    await waitForAnimationFrameWithCondition(_ => {
+        return animation.effect.getComputedTiming().localTime >= DURATION;
+    });
+
+    animation.cancel();
+  }, "Stateless animator should preserve the local time of its effect.");
 
   promise_test(async t => {
     await runInAnimationWorklet(document.getElementById('state_function_returns_empty').textContent);
